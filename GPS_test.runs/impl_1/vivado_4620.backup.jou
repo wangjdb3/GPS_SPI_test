@@ -2,8 +2,13 @@
 # Vivado v2017.2 (64-bit)
 # SW Build 1909853 on Thu Jun 15 18:39:09 MDT 2017
 # IP Build 1909766 on Thu Jun 15 19:58:00 MDT 2017
+<<<<<<< Updated upstream:GPS_test.runs/impl_1/vivado_4620.backup.jou
 # Start of session at: Sun Jul  9 14:41:14 2017
 # Process ID: 4620
+=======
+# Start of session at: Wed Jul 12 21:15:31 2017
+# Process ID: 49440
+>>>>>>> Stashed changes:GPS_test.runs/impl_1/vivado.jou
 # Current directory: E:/FPGA/Xilinx/projects/GPS_test/GPS_test.runs/impl_1
 # Command line: vivado.exe -log gps.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source gps.tcl -notrace
 # Log file: E:/FPGA/Xilinx/projects/GPS_test/GPS_test.runs/impl_1/gps.vdi

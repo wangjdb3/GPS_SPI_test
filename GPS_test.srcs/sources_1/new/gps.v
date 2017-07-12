@@ -52,14 +52,16 @@ module gps(
 		.O  (clk_200M)			//时钟缓冲输出
 	);
 	
-	reg select1, select2;
-	wire spi_cs_n, spi_clk, spi_mosi;
-	wire Gtx, Grx;
-	wire start_sign;
-	wire[7:0] tdata;
-	reg[7:0] add;
-	wire Data_done;
+	//reg select1, select2;
+	wire urx_done, Data_done;
+	wire fifo_ur_wr_en, fifo_ur_rd_en;
+	wire fifo_ut_wr_en, fifo_ut_rd_en;
+	wire[7:0] fifo_ur_din, fifo_ur_dout;
+	wire[7:0] fifo_ut_din, fifo_ut_dout;
+	wire fifo_ur_full, fifo_ur_almost_full, fifo_ut_full, fifo_ut_almost_full;
+	wire fifo_ur_empty, fifo_ur_almost_empty, fifo_ut_empty, fifo_ut_almost_empty;
 	
+	reg start_sign;
 	reg [23:0] count;
 	reg [3:0] key_scan;
 	always @(posedge clk_200M or negedge reset_n)     //检测时钟的上升沿和复位的下降沿
@@ -85,21 +87,22 @@ module gps(
 		if(!reset_n)
 			begin
 			LED <= 4'b1111;
-			select1 <= 1'b0;
-			select2 <= 1'b0;
+			start_sign <= 1'b0;
+			//select1 <= 1'b0;
+			//select2 <= 1'b0;
 			end
 		else
 			begin
 			if ( flag_key[0] )
 				begin
 				LED[0] <= ~LED[0];
-				select1 <= ~select1;
+				start_sign <= ~start_sign;
 				end
 				else
 			if ( flag_key[1] )
 				begin
 				LED[1] <= ~LED[1];
-				select2 <= ~select2;
+//				select2 <= ~select2;
 				end
 			if ( flag_key[2] )
 				begin 
@@ -112,42 +115,59 @@ module gps(
 	SPI SPI_0(
 		.clk_200M(clk_200M),
 		.reset_n(reset_n),
-		.spi_cs_n(spi_cs_n),
-		.spi_clk(spi_clk),
+		.spi_cs_n(sda_spi_cs_n),
+		.spi_clk(sda_spi_clk),
 		.spi_miso(tx_spi_miso),
-		.spi_mosi(spi_mosi),
+		.spi_mosi(rx_spi_mosi),
 		.TP(TP),
-		.tdata(tdata),
+		.stdata(fifo_ur_dout),
+		.srdata(fifo_ut_din),
 		.start_sign(start_sign),
+		.urx_done(urx_done),
+		.fifo_ur_empty(fifo_ur_empty),
+		.fifo_ur_re(fifo_ur_rd_en),
+		.fifo_ut_we(fifo_ut_wr_en),
 		.Data_done(Data_done)
 	);
 	
 	uart uart_0(
-		.Gtx(tx_spi_miso),
-		.Grx(Grx),
+		.clk_200M(clk_200M),
+		.reset_n(reset_n),
 		.tx(tx),
 		.rx(rx),
-		.TP(TP)
+		.rx_done(urx_done),
+		.Tdata(fifo_ut_dout),
+		.Rdata(fifo_ur_din),
+		.fifor_we(fifo_ur_wr_en),
+		.fifot_empty(fifo_ut_empty),
+		.fifot_re(fifo_ut_rd_en)
 	);
 	
-	dist_mem_gen_0 rom_0 (
-	  .a(add),      // input wire [7 : 0] a
-	  .spo(tdata)  // output wire [7 : 0] spo
+	fifo fifo_ut (
+	  .clk(clk_200M),                    // input wire clk
+	  .srst(~reset_n),                  // input wire srst
+	  .din(fifo_ut_din),                    // input wire [7 : 0] din
+	  .wr_en(fifo_ut_wr_en),                // input wire wr_en
+	  .rd_en(fifo_ut_rd_en),                // input wire rd_en
+	  .dout(fifo_ut_dout),                  // output wire [7 : 0] dout
+	  .full(fifo_ut_full),                  // output wire full
+	  .almost_full(fifo_ut_almost_full),    // output wire almost_full
+	  .empty(fifo_ut_empty),                // output wire empty
+	  .almost_empty(fifo_ut_almost_empty)  // output wire almost_empty
 	);
 	
-	always @( posedge clk_200M or negedge reset_n)
-		if (!reset_n)
-			begin
-			add <= 8'd0;
-			end
-		else if(Data_done  && add < 100)
-			add <= add + 8'd1;
-	
-	assign sda_spi_cs_n = select1 ? spi_cs_n : 1'b1;
-	assign sda_spi_clk = select1 ? spi_clk : 1'bz;
-	assign rx_spi_mosi = select1 ? spi_mosi : Grx;
-	assign D_SEL = select2 ? 1'b0 : 1'b1;
-	assign start_sign = select1 ? 1'b1 : 1'b0;
+	fifo fifo_ur (
+		  .clk(clk_200M),                    // input wire clk
+		  .srst(~reset_n),                  // input wire srst
+		  .din(fifo_ur_din),                    // input wire [7 : 0] din
+		  .wr_en(fifo_ur_wr_en),                // input wire wr_en
+		  .rd_en(fifo_ur_rd_en),                // input wire rd_en
+		  .dout(fifo_ur_dout),                  // output wire [7 : 0] dout
+		  .full(fifo_ur_full),                  // output wire full
+		  .almost_full(fifo_ur_almost_full),    // output wire almost_full
+		  .empty(fifo_ur_empty),                // output wire empty
+		  .almost_empty(fifo_ur_almost_empty)  // output wire almost_empty
+		);
 	
 	assign spi_cs_n_d = sda_spi_cs_n;
 	assign spi_clk_d = sda_spi_clk;
@@ -155,5 +175,6 @@ module gps(
 	assign spi_mosi_d = rx_spi_mosi;
 	
 	assign SAFEBOOT_N = 1'b1;
+	assign D_SEL = 1'b0;
 	
 endmodule

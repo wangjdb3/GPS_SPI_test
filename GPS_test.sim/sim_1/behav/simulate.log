@@ -11,26 +11,36 @@
 # //  is prohibited from disclosure under the Trade Secrets Act,
 # //  18 U.S.C. Section 1905.
 # //
-# do {gps_simulate.do}
-# vsim -voptargs=""+acc"" -L dist_mem_gen_v8_0_11 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip -L xpm -lib xil_defaultlib xil_defaultlib.gps xil_defaultlib.glbl 
-# Start time: 18:53:46 on Jul 08,2017
+# do {uart_simulate.do}
+# vsim -voptargs=""+acc"" -L xil_defaultlib -L fifo_generator_v13_1_4 -L unisims_ver -L unimacro_ver -L secureip -L xpm -lib xil_defaultlib xil_defaultlib.uart xil_defaultlib.glbl 
+# Start time: 20:36:59 on Jul 11,2017
 # ** Note: (vsim-3812) Design is being optimized...
-# ** Note: (vopt-143) Recognized 1 FSM in module "SPI(fast)".
-# Loading work.gps(fast)
-# Loading unisims_ver.IBUFGDS(fast)
-# Loading unisims_ver.IBUFDS(fast)
-# Loading work.SPI(fast)
+# ** Note: (vopt-143) Recognized 2 FSMs in module "uart(fast)".
 # Loading work.uart(fast)
-# Loading work.dist_mem_gen_0(fast)
-# Loading dist_mem_gen_v8_0_11.dist_mem_gen_v8_0_11(fast)
 # Loading work.glbl(fast)
 # 1
 # 1
 # .main_pane.wave.interior.cs.body.pw.wf
 # .main_pane.structure.interior.cs.body.struct
 # .main_pane.objects.interior.cs.body.tree
-# WARNING: This core is supplied with a behavioral model. To model cycle-accurate behavior you must run timing simulation.
-# ** Warning: (vsim-PLI-3408) Too few data words read on line 6 of file "dist_mem_gen_0.mif". Expected 256, found 5.    : D:/Xilinx/Vivado/2017.2/data/ip/xilinx/dist_mem_gen_v8_0/simulation/dist_mem_gen_v8_0.v(234)
-#    Time: 0 ps  Iteration: 0  Instance: /gps/rom_0/inst
-# End time: 18:54:10 on Jul 08,2017, Elapsed time: 0:00:24
-# Errors: 0, Warnings: 1
+restart
+# ** Note: (vsim-8009) Loading existing optimized design _opt
+# Loading work.uart(fast)
+# Loading work.glbl(fast)
+force -freeze sim:/uart/clk_200M 1 0, 0 {2500 ps} -r 5000
+restart
+force -freeze sim:/uart/reset_n 1'h0 0
+force -freeze sim:/uart/Tdata 8'haa 0
+force -freeze sim:/uart/fifo1_empty 1'h1 0
+run
+run
+noforce sim:/uart/reset_n
+run
+force -freeze sim:/uart/fifo1_empty 1'h0 0
+run
+run
+run
+# Can't move the Now cursor.
+# Can't move the Now cursor.
+# End time: 20:39:13 on Jul 11,2017, Elapsed time: 0:02:14
+# Errors: 2, Warnings: 0

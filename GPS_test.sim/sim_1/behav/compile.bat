@@ -1,6 +1,6 @@
 @echo off
 set bin_path=D:\\modeltech64_10.5\\win64
-call %bin_path%/vsim  -c -do "do {gps_compile.do}" -l compile.log
+call %bin_path%/vsim  -c -do "do {uart_compile.do}" -l compile.log
 if "%errorlevel%"=="1" goto END
 if "%errorlevel%"=="0" goto SUCCESS
 :END
