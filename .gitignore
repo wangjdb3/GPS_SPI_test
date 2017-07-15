@@ -1,0 +1,12 @@
+
+GPS_test\.cache/
+
+*.log
+
+GPS_test\.runs/
+
+vivado_pid2408\.zip
+
+vivado\.jou
+
+vivado_2408\.backup\.jou
