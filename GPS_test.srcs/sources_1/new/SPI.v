@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 2017/07/05 22:23:52
+// Create Date: 2017/07/20 16:30:54
 // Design Name: 
-// Module Name: SPI
+// Module Name: spi
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,254 +20,71 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module SPI(
-    input wire clk_200M,
-    input wire reset_n,
-    output reg spi_cs_n,
-    output reg spi_clk,
-    input wire spi_miso,
-    output reg spi_mosi,
-    input wire TP,
-    input wire[7:0] tdata,
-    input wire start_sign,
-    output reg Data_done
+module spi(
+	input wire clk,
+	input wire reset_n,
+	input wire flag_key,
+	output wire LED,
+	output wire spi_cs_n,			///////////
+	output wire spi_clk,			//	SPI
+	input wire spi_miso,			//
+	output wire spi_mosi,			///////////
+	output wire[31:0] GPS_time,		///////////
+	output wire[23:0] GPS_date,		//
+	output wire[31:0] GPS_Latitude,	//
+	output wire[39:0] GPS_Longitude,//  GPS_Data
+	output wire[15:0] GPS_speed,	//
+	output wire[15:0] GPS_degree,	////////////
+	output wire GPS_reserve_done,
+	input wire GPS_reserve_read	
 );
-	parameter Nop = 12'b000000000001, Start = 12'b000000000010, Delay = 12'b000000000100, Stop = 12'b000000001000;
-	parameter C1 = 12'b000000010000, C2 = 12'b000000100000, C3 = 12'b000001000000, C4 = 12'b000010000000;
-	parameter C5 = 12'b000100000000, C6 = 12'b001000000000, C7 = 12'b010000000000, C8 = 12'b100000000000;
-	reg[11:0] counter;
-	reg[11:0] state;
-	reg[17:0] counter2;
-	
-	always @( posedge clk_200M or negedge reset_n )
-		if(!reset_n)
-			begin
-			state <= Nop;
-			spi_cs_n <= 1'b1;
-			spi_clk <= 1'b0;
-			spi_mosi <= 1'b0;
-			counter <= 12'd0;
-			counter2 <= 18'd0;
-			Data_done <= 1'b0;
-			end
-		else
-			case (state)
-			Nop:
-				if (start_sign)
-					begin
-					spi_cs_n <= 1'b0;
-					state <= Start;
-					spi_clk <= 1'b0;
-					end
-			Start:
-				case (counter)
-				12'd2949:
-					begin spi_mosi <= tdata[7]; counter <= counter + 12'd1;end
-				12'd2999:
-					begin
-					state <= C1;
-					spi_clk <= 1'b1;
-					counter <= 12'd0;
-					end
-				default:
-					begin counter <= counter + 12'd1; end
-				endcase
-			C1:
-				case(counter)
-				12'd49:
-					begin
-					spi_clk <= 1'b0;
-					counter <= counter + 12'd1;
-					counter2 <= counter2 + 18'd1;
-					end
-				12'd59:
-					begin spi_mosi <= tdata[6]; counter <= counter + 12'd1;end
-				12'd99:
-					begin
-					state <= C2;
-					spi_clk <= 1'b1;
-					counter <= 12'd0;
-					counter2 <= counter2 + 18'd1;
-					end
-				default:
-					begin counter <= counter + 12'd1; counter2 <= counter2 + 18'd1; end
-				endcase
-			C2:
-				case(counter)
-				12'd49:
-					begin
-					spi_clk <= 1'b0;
-					counter <= counter + 12'd1;
-					counter2 <= counter2 + 18'd1; 
-					end
-				12'd59:
-					begin spi_mosi <= tdata[5]; counter <= counter + 12'd1;end
-				12'd99:
-					begin
-					state <= C3;
-					spi_clk <= 1'b1;
-					counter <= 12'd0;
-					counter2 <= counter2 + 18'd1; 
-					end
-				default:
-					begin counter <= counter + 12'd1; counter2 <= counter2 + 18'd1; end
-				endcase
-			C3:
-				case(counter)
-				12'd49:
-					begin
-					spi_clk <= 1'b0;
-					counter <= counter + 12'd1;
-					counter2 <= counter2 + 18'd1;
-					end
-				12'd59:
-					begin spi_mosi <= tdata[4]; counter <= counter + 12'd1;end
-				12'd99:
-					begin
-					state <= C4;
-					spi_clk <= 1'b1;
-					counter <= 12'd0;
-					counter2 <= counter2 + 12'd1;
-					end
-				default:
-					begin counter <= counter + 12'd1; counter2 <= counter2 + 18'd1; end
-				endcase
-			C4:
-				case(counter)
-				12'd49:
-					begin
-					spi_clk <= 1'b0;
-					counter <= counter + 12'd1;
-					counter2 <= counter2 + 18'd1;
-					end
-				12'd59:
-					begin spi_mosi <= tdata[3]; counter <= counter + 12'd1;end
-				12'd99:
-					begin
-					state <= C5;
-					spi_clk <= 1'b1;
-					counter <= 12'd0;
-					counter2 <= counter2 + 18'd1;
-					end
-				default:
-					begin counter <= counter + 12'd1; counter2 <= counter2 + 18'd1; end
-				endcase
-			C5:
-				case(counter)
-				12'd49:
-					begin
-					spi_clk <= 1'b0;
-					counter <= counter + 12'd1;
-					counter2 <= counter2 + 18'd1;
-					end
-				12'd59:
-					begin spi_mosi <= tdata[2]; counter <= counter + 12'd1;end
-				12'd99:
-					begin
-					state <= C6;
-					spi_clk <= 1'b1;
-					counter <= 12'd0;
-					counter2 <= counter2 + 18'd1;
-					end
-				default:
-					begin counter <= counter + 12'd1; counter2 <= counter2 + 18'd1; end
-				endcase
-			C6:
-				case(counter)
-				12'd49:
-					begin
-					spi_clk <= 1'b0;
-					counter <= counter + 12'd1;
-					counter2 <= counter2 + 18'd1;
-					end
-				12'd59:
-					begin spi_mosi <= tdata[1]; counter <= counter + 12'd1;end
-				12'd99:
-					begin
-					state <= C7;
-					spi_clk <= 1'b1;
-					counter <= 12'd0;
-					counter2 <= counter2 + 18'd1;
-					end
-				default:
-					begin counter <= counter + 12'd1; counter2 <= counter2 + 18'd1; end
-				endcase
-			C7:
-				case(counter)
-				12'd49:
-					begin
-					spi_clk <= 1'b0;
-					counter <= counter + 12'd1;
-					counter2 <= counter2 + 18'd1; 
-					end
-				12'd59:
-					begin spi_mosi <= tdata[0]; counter <= counter + 12'd1;end
-				12'd99:
-					begin
-					state <= C8;
-					spi_clk <= 1'b1;
-					counter <= 12'd0;
-					counter2 <= counter2 + 18'd1; 
-					end
-				default:
-					begin counter <= counter + 12'd1; counter2 <= counter2 + 18'd1; end
-				endcase
-			C8:
-				case(counter)
-				12'd49:
-					begin
-					spi_clk <= 1'b0;
-					counter <= counter + 12'd1;
-					counter2 <= counter2 + 18'd1;
-					Data_done <= 1'b1;
-					end
-				12'd50:
-					begin Data_done <= 1'b0; counter <= counter + 12'd1; counter2 <= counter2 + 18'd1; end
-				12'd59:
-					begin
-					if(counter2 > 18'd1508)
-						spi_mosi <= tdata[7];
-					counter <= counter + 12'd1;
-					counter2 <= counter2 + 18'd1;
-					end
-				12'd99:
-					begin
-					counter <= 12'd0;
-					if(counter2 < 18'd1599)
-						begin state <= Delay; counter2 <= counter2 + 18'd1; end
-					else if(!start_sign)
-						begin spi_cs_n <= 1'b1; state <= Stop; counter2 <= 18'd0; end
-					else
-						begin spi_clk <= 1'b1; state <= C1; counter2 <= 18'd0; end
-					end
-				default:
-					begin counter <= counter + 12'd1; counter2 <= counter2 + 18'd1; end
-				endcase
-			Delay:
-				case(counter2)
-				18'd1559:
-					begin
-					if(start_sign)
-						spi_mosi <= tdata[7];
-					counter2 <= counter2 + 18'd1; 
-					end
-				18'd1599:
-					if(start_sign)
-						begin spi_clk <= 1'b1; state <= C1; counter2 <= 18'd0; end
-					else
-						begin spi_cs_n <= 1'b1; state <= Stop; counter2 <= 18'd0; end
-				default:
-					counter2 <= counter2 + 18'd1;
-				endcase
-			Stop:
-				case(counter2)
-				18'd199999:
-					begin state <= Nop; counter2 <= 18'd0; end
-				default:
-					counter2 <= counter2 + 18'd1;
-				endcase
-			endcase
-			
-	//assign D_SEL = 1'b0;
-	
+wire start_sign;
+wire[7:0] srdata;
+wire Data_done;
+wire BCD_start, Bin_done;
+wire[39:0] BCDtemp;
+wire[33:0] Bintemp;
+
+spi_controller spi_controller(
+	.clk_200M(clk),
+	.reset_n(reset_n),
+	.Data_done(Data_done),
+	.srdata(srdata),//8
+	.flag_key(flag_key),
+	.start_sign(start_sign),
+	.LED(LED),
+	.times(GPS_time),//32
+	.date(GPS_date),//24
+	.Latitude_reg(GPS_Latitude),//32
+	.Longitude_reg(GPS_Longitude),//40
+	.speed_reg(GPS_speed),//16
+	.degree_reg(GPS_degree),//16
+	.GPS_reserve_done(GPS_reserve_done),
+	.GPS_reserve_read(GPS_reserve_read),
+	.BCD_start(BCD_start),
+	.BCDtemp(BCDtemp),//40
+	.Bintemp(Bintemp),//34
+	.Bin_done(Bin_done)
+);
+
+spi_interface spi_interface(
+	.clk_200M(clk),
+	.reset_n(reset_n),
+	.spi_cs_n(spi_cs_n),
+	.spi_clk(spi_clk),
+	.spi_miso(spi_miso),
+	.spi_mosi(spi_mosi),
+	.srdata(srdata),//8
+	.start_sign(start_sign),
+	.Data_done(Data_done)
+);
+
+BCD_to_Bin BCD_to_Bin(
+	.clk(clk),
+	.reset_n(reset_n),
+	.start(BCD_start),
+	.BCD(BCDtemp),
+	.Bin(Bintemp),
+	.Done(Bin_done)
+);
 endmodule

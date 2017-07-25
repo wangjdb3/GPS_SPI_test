@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GenRun Id="synth_1" LaunchPart="xc7a100tfgg484-2" LaunchTime="1499749851">
-  <File Type="RDS-PROPCONSTRS" Name="gps_drc_synth.rpt"/>
   <File Type="PA-TCL" Name="gps.tcl"/>
+  <File Type="RDS-PROPCONSTRS" Name="gps_drc_synth.rpt"/>
   <File Type="RDS-RDS" Name="gps.vds"/>
   <File Type="RDS-UTIL" Name="gps_utilization_synth.rpt"/>
   <File Type="RDS-UTIL-PB" Name="gps_utilization_synth.pb"/>

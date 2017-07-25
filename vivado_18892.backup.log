@@ -1,0 +1,22 @@
+#-----------------------------------------------------------
+# Vivado v2017.2 (64-bit)
+# SW Build 1909853 on Thu Jun 15 18:39:09 MDT 2017
+# IP Build 1909766 on Thu Jun 15 19:58:00 MDT 2017
+# Start of session at: Sat Jul 15 19:33:51 2017
+# Process ID: 18892
+# Current directory: E:/FPGA/Xilinx/projects/GPS_test
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent16256 E:\FPGA\Xilinx\projects\GPS_test\GPS_test.xpr
+# Log file: E:/FPGA/Xilinx/projects/GPS_test/vivado.log
+# Journal file: E:/FPGA/Xilinx/projects/GPS_test\vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project E:/FPGA/Xilinx/projects/GPS_test/GPS_test.xpr
+Scanning sources...
+Finished scanning sources
+WARNING: [Project 1-509] GeneratedRun file for 'synth_1' not found
+WARNING: [Project 1-509] GeneratedRun file for 'impl_1' not found
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'D:/Xilinx/Vivado/2017.2/data/ip'.
+exit
+INFO: [Common 17-206] Exiting Vivado at Sat Jul 15 19:34:21 2017...
